@@ -2,6 +2,7 @@ class Ball {
     constructor(game) {
         this.game = game;
         this.radius = 4;
+        this.restartBB = new BoundingBox(params.CANVAS_WIDTH / 2 - 83, 400 - 42, 160, 50);
 
         // offsets used to help track top left of ball
         this.xOffset = this.radius;
@@ -11,8 +12,8 @@ class Ball {
         this.x = (params.CANVAS_WIDTH / 2) - this.xOffset;
         this.y = (params.CANVAS_HEIGHT) - this.yOffset;
 
-        this.xSpeed = 120;
-        this.ySpeed = 120;
+        this.xSpeed = 360;
+        this.ySpeed = 360;
 
         this.updateBB()
     }
@@ -23,6 +24,20 @@ class Ball {
     }
 
     update() {
+        if (this.lostGame && this.game.click) {
+            this.mouseBB = new BoundingBox(this.game.mouse.x, this.game.mouse.y, 1, 1);
+
+            if (this.mouseBB.collide(this.restartBB)) {
+                document.location.reload();
+            }
+
+            this.game.click = null;
+        }
+
+        if (this.game.mouse) {
+            this.mouseBB = new BoundingBox(this.game.mouse.x, this.game.mouse.y, 1, 1);
+        }
+
         this.x += this.xSpeed * this.game.clockTick;
         this.y -= this.ySpeed * this.game.clockTick;
         this.updateBB();
@@ -34,7 +49,9 @@ class Ball {
         } else if (this.BB.top <= this.game.area.top) {
             this.ySpeed = -this.ySpeed;
         } else if (this.BB.bottom >= this.game.area.bottom) {
-            this.ySpeed = -this.ySpeed;
+            this.ySpeed = 0;
+            this.xSpeed = 0;
+            this.lostGame = true;
         }
 
         var that = this;
@@ -54,6 +71,7 @@ class Ball {
                     if (that.lastBB.bottom <= entity.BB.top) {
                         that.ySpeed = -that.ySpeed;
                     } else if (that.lastBB.right <= entity.BB.left || that.lastBB.left >= entity.BB.right) { // ball was to the right or left
+                        that.ySpeed = -that.ySpeed;
                         that.xSpeed = -that.xSpeed;
                     }
                 }
@@ -69,5 +87,21 @@ class Ball {
         ctx.arc(this.x + this.radius, this.y + this.radius, this.radius, 0, 2 * Math.PI);
         ctx.fill();
         ctx.stroke();
+
+        if (this.lostGame) {
+            ctx.fillStyle = "White";
+            ctx.strokeStyle = "White";
+            ctx.textAlign = "center";
+            ctx.font = "Bold 30px 'Press Start 2p'";
+            ctx.lineWidth = 5;
+            ctx.fillText("Snooze You Lose!", params.CANVAS_WIDTH / 2, params.CANVAS_HEIGHT / 2);
+
+            if (this.mouseBB.collide(this.restartBB)) {
+                ctx.fillStyle = "Blue";
+                ctx.strokeStyle = "Blue";
+            }
+            ctx.fillText("RESET", params.CANVAS_WIDTH / 2, 400);
+            ctx.strokeRect(params.CANVAS_WIDTH / 2 - 83, 400 - 42, 160, 50);
+        }
     }
 }
