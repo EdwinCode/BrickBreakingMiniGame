@@ -49,6 +49,14 @@ class Ball {
                         that.xSpeed = -that.xSpeed;
                     }
                 }
+
+                if (entity instanceof Paddle) {
+                    if (that.lastBB.bottom <= entity.BB.top) {
+                        that.ySpeed = -that.ySpeed;
+                    } else if (that.lastBB.right <= entity.BB.left || that.lastBB.left >= entity.BB.right) { // ball was to the right or left
+                        that.xSpeed = -that.xSpeed;
+                    }
+                }
             }
         });
     }

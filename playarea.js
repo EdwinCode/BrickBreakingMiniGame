@@ -11,6 +11,9 @@ class PlayArea {
         this.ball = new Ball(game);
         this.game.addEntity(this.ball);
 
+        this.paddle = new Paddle(game, 0, 480);
+        this.game.addEntity(this.paddle);
+
         this.setUpBricks();
     }
 
