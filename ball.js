@@ -11,8 +11,8 @@ class Ball {
         this.x = (params.CANVAS_WIDTH / 2) - this.xOffset;
         this.y = (params.CANVAS_HEIGHT) - this.yOffset;
 
-        this.xSpeed = 50;
-        this.ySpeed = 50;
+        this.xSpeed = 120;
+        this.ySpeed = 120;
 
         this.updateBB()
     }
@@ -40,7 +40,15 @@ class Ball {
         var that = this;
         this.game.entities.forEach(function (entity) {
             if (entity.BB && that.BB.collide(entity.BB)) {
+                if (entity instanceof Brick) {
+                    entity.removeFromWorld = true;
 
+                    if (that.lastBB.bottom <= entity.BB.top || that.lastBB.top >= entity.BB.bottom) { // ball was above or below
+                        that.ySpeed = -that.ySpeed;
+                    } else if (that.lastBB.right <= entity.BB.left || that.lastBB.left >= entity.BB.right) { // ball was to the right or left
+                        that.xSpeed = -that.xSpeed;
+                    }
+                }
             }
         });
     }
